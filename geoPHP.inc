@@ -33,6 +33,24 @@ include_once("lib/geometry/GeometryCollection.class.php");
 
 class geoPHP
 {
+    private static $adapterMap = [
+        'wkt'            => 'WKT',
+        'ewkt'           => 'EWKT',
+        'wkb'            => 'WKB',
+        'ewkb'           => 'EWKB',
+        'json'           => 'GeoJSON',
+        'geojson'        => 'GeoJSON',
+        'kml'            => 'KML',
+        'gpx'            => 'GPX',
+        'georss'         => 'GeoRSS',
+        'google_geocode' => 'GoogleGeocode',
+        'geohash'        => 'GeoHash',
+    ];
+
+    static function registerAdapter($name, $class)
+    {
+        self::$adapterMap[$name] = $class;
+    }
 
   static function version() {
     return '1.2';
@@ -54,12 +72,12 @@ class geoPHP
       if (is_object($data)) {
         if ($data instanceOf Geometry) return $data;
       }
-      
+
       $detected = geoPHP::detectFormat($data);
       if (!$detected) {
         return FALSE;
       }
-      
+
       $format = explode(':', $detected);
       $type = array_shift($format);
       $args = $format;
@@ -90,19 +108,7 @@ class geoPHP
   }
 
   static function getAdapterMap() {
-    return array (
-      'wkt' =>  'WKT',
-      'ewkt' => 'EWKT',
-      'wkb' =>  'WKB',
-      'ewkb' => 'EWKB',
-      'json' => 'GeoJSON',
-      'geojson' => 'GeoJSON',
-      'kml' =>  'KML',
-      'gpx' =>  'GPX',
-      'georss' => 'GeoRSS',
-      'google_geocode' => 'GoogleGeocode',
-      'geohash' => 'GeoHash',
-    );
+      return self::$adapterMap;
   }
 
   static function geometryList() {
@@ -200,7 +206,7 @@ class geoPHP
     }
 
     $geom_types = array_unique($geom_types);
-    
+
     if (empty($geom_types)) {
       return FALSE;
     }
